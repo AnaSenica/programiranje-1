@@ -1,5 +1,7 @@
 import csv
 import os
+import re
+import requests
 
 ###############################################################################
 # Najprej definirajmo nekaj pomožnih orodij za pridobivanje podatkov s spleta.
@@ -8,11 +10,11 @@ import os
 # definiratje URL glavne strani bolhe za oglase z mačkami
 cats_frontpage_url = 'http://www.bolha.com/zivali/male-zivali/macke/'
 # mapa, v katero bomo shranili podatke
-cat_directory = 'TODO'
+cat_directory = 'macke'
 # ime datoteke v katero bomo shranili glavno stran
-frontpage_filename = 'TODO'
+frontpage_filename = 'macke_stran.html'
 # ime CSV datoteke v katero bomo shranili podatke
-csv_filename = 'TODO'
+csv_filename = 'macke.csv'
 
 
 def download_url_to_string(url):
@@ -20,14 +22,17 @@ def download_url_to_string(url):
     strani kot niz. V primeru, da med izvajanje pride do napake vrne None.
     """
     try:
-        # del kode, ki morda sproži napako
-        page_content = 'TODO'
-    except 'TODO':
+        # del kode, ki morda sproži napako. To je del kode, ki requesta spletno stran. get() nam vrne nek response, .text to razpakira: torej dobimo tekst
+        page_content = requests.get(url).text
+    except requests.exceptions.RequestException as e:
+        #ujeli smo nas error kot e, ga sprintamo, da vidimo, kaj je narobe. Nastavili bomo, da je stran prazna, lahko bi pa tudi samo prekinili delovanje funkcije.
+        # v nasem primeru bo se vedno ujelo vse strani, razen tistih nekja, ki dvignejo napako. S temi stranmi se bomo potem ukvarjali posebej.
+        print(e)
+        page_content = ''
         # koda, ki se izvede pri napaki
         # dovolj je če izpišemo opozorilo in prekinemo izvajanje funkcije
-        raise NotImplementedError()
     # nadaljujemo s kodo če ni prišlo do napake
-    raise NotImplementedError()
+    return page_content
 
 
 def save_string_to_file(text, directory, filename):
@@ -48,7 +53,11 @@ def save_string_to_file(text, directory, filename):
 def save_frontpage(page, directory, filename):
     """Funkcija shrani vsebino spletne strani na naslovu "page" v datoteko
     "directory"/"filename"."""
-    raise NotImplementedError()
+    content = download_url_to_string(page)
+    save_string_to_file(content, directory, filename)
+    return
+
+#Na koncu v terminalu poklicem save_frontpage(cats_frontpage_url, cat_directory, frontpage_filename), pojavi se nova mapa macke z datoteko macke_stran.html
 
 
 ###############################################################################
@@ -58,7 +67,9 @@ def save_frontpage(page, directory, filename):
 
 def read_file_to_string(directory, filename):
     """Funkcija vrne celotno vsebino datoteke "directory"/"filename" kot niz"""
-    raise NotImplementedError()
+    path = os.path.join(directory, filename)
+    with open(path, 'r') as datoteka1:
+        return datoteka1.read()
 
 
 # Definirajte funkcijo, ki sprejme niz, ki predstavlja vsebino spletne strani,
@@ -68,10 +79,14 @@ def read_file_to_string(directory, filename):
 
 
 def page_to_ads(page_content):
-    """Funkcija poišče posamezne ogllase, ki se nahajajo v spletni strani in
+    """Funkcija poišče posamezne oglase, ki se nahajajo v spletni strani in
     vrne njih seznam"""
-    raise NotImplementedError()
+    # (.*?) pomeni katerikoli znak, od 0 naprej, ? pomeni, da ni požrešen način. Torej pobere čim manj, kolikor je možno.
+    # modul .DOTALL na knjižnici re poskrbi, da pika pomeni katerikoli znak, tudi presledke (če ni dotall, pika pomeni katerikoli znak razen presledkov)
+    izraz = re.compile(r'<div class="ad">(.*?)<div class="clear">', re.DOTALL)
+    return [m.group(0) for m in re.finditer(izraz, page_content)]
 
+# Da preverim delovanje te funkcije, vstavim tole: niz = ' <div class="ad"><div class="clear"></div></div><div class="ad"><div class="coloumn image"><td><a titl<div class="clear">'
 
 # Definirajte funkcijo, ki sprejme niz, ki predstavlja oglas, in izlušči
 # podatke o imenu, ceni in opisu v oglasu.
@@ -81,6 +96,10 @@ def get_dict_from_ad_block(block):
     """Funkcija iz niza za posamezen oglasni blok izlušči podatke o imenu, ceni
     in opisu ter vrne slovar, ki vsebuje ustrezne podatke
     """
+    izraz = re.compile(
+        r'title ="(?P<ime>.*?)"'
+        r'.*?class="price">(?P<cena>.*?)</div'
+    )
     raise NotImplementedError()
 
 
@@ -157,5 +176,5 @@ def main(redownload=True, reparse=True):
     raise NotImplementedError()
 
 
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+#    main()
