@@ -58,7 +58,7 @@ def save_frontpage(page, directory, filename):
     return
 
 #Na koncu v terminalu poklicem save_frontpage(cats_frontpage_url, cat_directory, frontpage_filename), pojavi se nova mapa macke z datoteko macke_stran.html
-
+# Zdaj je to zakomentirano, ker sem enkrat že poklicala to funkcijo in že mam to mojo datoteko.
 
 ###############################################################################
 # Po pridobitvi podatkov jih želimo obdelati.
@@ -86,21 +86,30 @@ def page_to_ads(page_content):
     izraz = re.compile(r'<div class="ad">(.*?)<div class="clear">', re.DOTALL)
     return [m.group(0) for m in re.finditer(izraz, page_content)]
 
-# Da preverim delovanje te funkcije, vstavim tole: niz = ' <div class="ad"><div class="clear"></div></div><div class="ad"><div class="coloumn image"><td><a titl<div class="clear">'
+# Da preverim delovanje te funkcije, vstavim npr. tole: niz = ' <div class="ad"><div class="clear"></div></div><div class="ad"><div class="coloumn image"><td><a titl<div class="clear">'
 
 # Definirajte funkcijo, ki sprejme niz, ki predstavlja oglas, in izlušči
 # podatke o imenu, ceni in opisu v oglasu.
 
 
-def get_dict_from_ad_block(block):
+def get_dict_from_ad_block(blok):
     """Funkcija iz niza za posamezen oglasni blok izlušči podatke o imenu, ceni
     in opisu ter vrne slovar, ki vsebuje ustrezne podatke
     """
     izraz = re.compile(
-        r'title ="(?P<ime>.*?)"'
-        r'.*?class="price">(?P<cena>.*?)</div'
+        r'<h3><a title="(?P<ime>.*?)"'
+        r'.*?>(?P<opis>.*?)</a></h3>'
+        r'.*?class="price">(<span>)?(?P<cena>.*?)( €</span>)?</div',
+        re.DOTALL
     )
-    raise NotImplementedError()
+    podatki = re.search(izraz, blok)
+    # .groupdict() vrne slovar POIMENOVANIH spremenljivk 
+    slovar = podatki.groupdict()
+    return slovar
+
+# Da preverim delovanje te funkcije, vstavim npr. tole:
+#'<span class="flag_newAd"></span>         </div><div class="coloumn content"><h3><a title="Gusarka Loti (DZZŽ Kranj)" href="http://www4103">Gusarka Loti (DZZŽ Kranj)</a></h3><div class="price">Po dogovoru</div>  <div class="clear"></div>  <div class="miscellaneous">'
+
 
 
 # Definirajte funkcijo, ki sprejme ime in lokacijo datoteke, ki vsebuje
@@ -108,11 +117,16 @@ def get_dict_from_ad_block(block):
 # vseh oglasih strani.
 
 
-def ads_from_file(filename, directory):
+def ads_from_file(ime_datoteke, lokacija_datoteke):
     """Funkcija prebere podatke v datoteki "directory"/"filename" in jih
     pretvori (razčleni) v pripadajoč seznam slovarjev za vsak oglas posebej."""
-    raise NotImplementedError()
+    stran = read_file_to_string(lokacija_datoteke, ime_datoteke)
+    oglasi = page_to_ads(stran)
+    seznam = [get_dict_from_ad_block(oglas) for oglas in oglasi]
+    return seznam
 
+def ads_frontpage():
+    return ads_from_file(frontpage_filename, cat_directory)
 
 ###############################################################################
 # Obdelane podatke želimo sedaj shraniti.
@@ -131,7 +145,7 @@ def write_csv(fieldnames, rows, directory, filename):
         writer.writeheader()
         for row in rows:
             writer.writerow(row)
-    return
+    return None
 
 
 # Definirajte funkcijo, ki sprejme neprazen seznam slovarjev, ki predstavljajo
