@@ -68,7 +68,7 @@ def save_frontpage(page, directory, filename):
 def read_file_to_string(directory, filename):
     """Funkcija vrne celotno vsebino datoteke "directory"/"filename" kot niz"""
     path = os.path.join(directory, filename)
-    with open(path, 'r') as datoteka1:
+    with open(path, 'r', encoding='utf8') as datoteka1:
         return datoteka1.read()
 
 
