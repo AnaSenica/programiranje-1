@@ -138,9 +138,13 @@ def write_csv(fieldnames, rows, directory, filename):
     Funkcija v csv datoteko podano s parametroma "directory"/"filename" zapiše
     vrednosti v parametru "rows" pripadajoče ključem podanim v "fieldnames"
     """
+    # makedirs() ustvari rekurzivno pot??
     os.makedirs(directory, exist_ok=True)
     path = os.path.join(directory, filename)
-    with open(path, 'w') as csv_file:
+    with open(path, 'w', encoding='utf8') as csv_file:
+        #  DictWriter ustvari objekt, ki deluje kot navaden writer, a za izhodne
+        # vrstice naredi slovarje. Fieldnames parameter so ključi, ki določijo
+        # vrstni red, v katerem so vrednosti slovarja podane writerow().
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
         for row in rows:
@@ -154,20 +158,25 @@ def write_csv(fieldnames, rows, directory, filename):
 
 
 def write_cat_ads_to_csv(ads, directory, filename):
-    """Funkcija vse podatke iz parametra "ads" zapiše v csv datoteko podano s
+    """Funkcija vse podatke iz parametra "ads" zapiše v csv datoteko, podano s
     parametroma "directory"/"filename". Funkcija predpostavi, da sa ključi vseh
-    sloverjev parametra ads enaki in je seznam ads neprazen.
+    slovarjev parametra ads enaki in je seznam ads neprazen.
 
     """
-    # Stavek assert preveri da zahteva velja
+    # Stavek assert preveri, da zahteva velja
     # Če drži se program normalno izvaja, drugače pa sproži napako
     # Prednost je v tem, da ga lahko pod določenimi pogoji izklopimo v
     # produkcijskem okolju
     assert ads and (all(j.keys() == ads[0].keys() for j in ads))
-    raise NotImplementedError()
+    write_csv(ads[0].keys(), ads, directory, filename)
+
+# Tole poženem, da s enardei csv:
+# write_cat_ads_to_csv(ads_frontpage(), cat_directory, csv_filename)
 
 
-# Celoten program poženemo v glavni funkciji
+# Celoten program poženemo v glavni funkciji (jaz sem to postopoma
+# naredila že pri vsakem sklopu posebej.)
+
 
 def main(redownload=True, reparse=True):
     """Funkcija izvede celoten del pridobivanja podatkov:
@@ -176,12 +185,13 @@ def main(redownload=True, reparse=True):
     3. Podatke shrani v csv datoteko
     """
     # Najprej v lokalno datoteko shranimo glavno stran
-
+    save_frontpage(cat_directory, frontpage_filename)
     # Iz lokalne (html) datoteke preberemo podatke
-
+    ads = page_to_ads(read_file_to_string(cat_directory, frontpage_filename))
     # Podatke prebermo v lepšo obliko (seznam slovarjev)
-
+    ads_nice = [get_dict_from_ad_block(ad) for ad in ads]
     # Podatke shranimo v csv datoteko
+    write_cat_ads_to_csv(ads_nice, cat_directory, csv_filename)
 
     # Dodatno: S pomočjo parameteov funkcije main omogoči nadzor, ali se
     # celotna spletna stran ob vsakem zagon prense (četudi že obstaja)
