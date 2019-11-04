@@ -210,7 +210,8 @@ let rec is_palindrome seznam =
  - : int list = [5; 4; 3; 3; 4]
 [*----------------------------------------------------------------------------*)
 
-let rec max_on_components = ()
+let rec max_on_components seznam1 seznam2 = ()
+  
 
 (*----------------------------------------------------------------------------*]
  Funkcija [second_largest] vrne drugo največjo vrednost v seznamu. Pri tem se
