@@ -210,9 +210,17 @@ let rec is_palindrome seznam =
  - : int list = [5; 4; 3; 3; 4]
 [*----------------------------------------------------------------------------*)
 
-let rec max_on_components seznam1 seznam2 = ()
+let rec max_on_components seznam1 seznam2 =
+  match seznam1, seznam2 with
+    | [], [] -> []
+    | x :: xs, [] -> []
+    | [], y :: ys -> []
+    | x :: xs, y :: ys -> if x > y then x :: max_on_components xs ys else y :: max_on_components xs ys
   
-
+let rec max_on_components1 list1 list2 =
+  match (list1, list2) with
+  | (x :: xs, y :: ys) -> max x y :: max_on_components1 xs ys
+  | _ -> []
 (*----------------------------------------------------------------------------*]
  Funkcija [second_largest] vrne drugo največjo vrednost v seznamu. Pri tem se
  ponovitve elementa štejejo kot ena vrednost. Predpostavimo, da ima seznam vsaj
@@ -223,4 +231,10 @@ let rec max_on_components seznam1 seznam2 = ()
  - : int = 10
 [*----------------------------------------------------------------------------*)
 
-let rec second_largest = ()
+
+let rec second_largest seznam =
+  let rec largest seznam =
+    match seznam with
+      | [] -> 0
+      | x :: xs -> if x > largest xs then x else largest xs
+  in largest (remove (largest seznam) seznam)
