@@ -25,7 +25,7 @@ type euro = Euro of float
 let euro_test = Euro 0.554
 type dollar = Dollar of float
 let dollar_test = Dollar 0.5
-
+type 'a zaporedje = int -> 'a
 let dollar_to_euro d =
 	match d with
 	| Dollar f -> Euro (0.91 *. f)
@@ -72,11 +72,10 @@ let to_yen = function
 [*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*)
 
 
-
 (*----------------------------------------------------------------------------*]
  Definirajte tip [intbool_list] s konstruktorji za:
   1.) prazen seznam,
-  2.) člen z celoštevilsko vrednostjo,
+  2.) člen s celoštevilsko vrednostjo,
   3.) člen z logično vrednostjo.
 
  Nato napišite testni primer, ki bi predstavljal "[5; true; false; 7]".
@@ -247,4 +246,26 @@ let rec count_magic2 ws =
  - : string option = Some "Jaina"
 [*----------------------------------------------------------------------------*)
 
-let rec find_candidate = ()
+type kandidati = None | Some of string
+
+let rec find_candidate magic specialisation wizard_list =
+	match wizard_list with
+		| [] -> None
+		| x :: xs -> 
+			match x.status with
+				| Newbie -> find_candidate magic specialisation xs
+				| Employed (carovnija, poklic) -> find_candidate magic specialisation xs
+				| Student (carovnija, int) ->
+					if magic = carovnija then
+						(match specialisation with
+							| Historian -> if int >= 3 then Some x.name else find_candidate magic specialisation xs
+							| Teacher -> if int >= 5 then Some x.name else find_candidate magic specialisation xs
+							| Researcher -> if int >= 4 then Some x.name else find_candidate magic specialisation xs
+						)
+					else find_candidate magic specialisation xs
+
+					
+let jaina = {name = "Jaina"; status = Student (Frost, 4)}
+let ana = {name = "Ana"; status = Student (Frost, 2)}
+let patrick = {name = "Patrick"; status = Student (Arcane, 3)}
+
