@@ -186,9 +186,10 @@ let rec loop pogoj f x =
 [*----------------------------------------------------------------------------*)
 
 let rec fold_left_no_acc f seznam = 
-  let fold_left_no_acc' f seznam acc =
-    match seznam with
-      | [] ->
+  match seznam with
+    | [] | _ :: [] -> failwith "premajhen seznam"
+    | x :: y :: [] -> f x y
+    | x :: y :: xs -> fold_left_no_acc f ((f x y) :: xs)
 
 (*----------------------------------------------------------------------------*]
  Funkcija [apply_sequence f x n] vrne seznam zaporednih uporab funkcije [f] na
@@ -202,7 +203,11 @@ let rec fold_left_no_acc f seznam =
  - : int list = []
 [*----------------------------------------------------------------------------*)
 
-let rec apply_sequence = ()
+let rec apply_sequence f x n =
+  let rec apply f x n acc =
+    if n <= 0 then reverse acc else apply f (f x) (n - 1) ((f x) :: acc)
+  in 
+  apply f x n []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [filter f list] vrne seznam elementov [list], pri katerih funkcija [f]
@@ -212,7 +217,14 @@ let rec apply_sequence = ()
  - : int list = [4; 5]
 [*----------------------------------------------------------------------------*)
 
-let rec filter = ()
+let rec filter f list =
+  let rec filter' f list acc =
+    match list with
+      | [] -> reverse acc
+      | x :: xs -> if f x then filter' f xs (x :: acc) else filter' f xs acc
+  in
+  filter' f list []
+
 
 (*----------------------------------------------------------------------------*]
  Funkcija [exists] sprejme seznam in funkcijo, ter vrne vrednost [true] čim
@@ -225,7 +237,16 @@ let rec filter = ()
  - : bool = false
 [*----------------------------------------------------------------------------*)
 
-let rec exists = ()
+let rec exists f seznam =
+  let z = filter f seznam
+  in
+  match z with
+   | [] -> false
+   | x :: xs -> true
+
+let rec exists_resitve f = function
+  | [] -> false
+  | x :: xs -> if f x then true else exists_resitve f xs
 
 (*----------------------------------------------------------------------------*]
  Funkcija [first f default list] vrne prvi element seznama, za katerega
@@ -238,4 +259,7 @@ let rec exists = ()
  - : int = 0
 [*----------------------------------------------------------------------------*)
 
-let rec first = ()
+let rec first f default seznam =
+    match seznam with
+      | [] -> default
+      | x :: xs -> if f x then x else first f default xs 
