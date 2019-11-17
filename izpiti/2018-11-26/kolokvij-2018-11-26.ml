@@ -107,3 +107,11 @@ Za zgornji primer torej dobimo:
 {status = Passenger (Group 1000); name = "Robin"} ];
 [ {status = Passenger (Group 0); name = "Xiao"} ]]*)
 
+let bloki seznam =
+	let rec bloki' seznam acc1 acc2 acc3 =
+		match seznam with
+			| [] -> [acc1; acc2; acc3]
+			| x :: xs -> if x.status = Staff then bloki' xs (x::acc1) acc2 acc3 
+									else if x.status = Passenger Top then bloki' xs acc1 (x::acc2) acc3 
+									else bloki' xs acc1 acc2 (x::acc3)
+	in bloki' seznam [] [] []
