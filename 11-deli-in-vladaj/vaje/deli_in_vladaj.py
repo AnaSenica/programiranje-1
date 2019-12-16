@@ -1,3 +1,5 @@
+import random
+
 ###############################################################################
 # Želimo definirati pivotiranje na mestu za tabelo [a]. Ker bi želeli
 # pivotirati zgolj dele tabele, se omejimo na del tabele, ki se nahaja med
@@ -27,6 +29,50 @@
 #     [10, 2, 0, 4, 11, 15, 17, 5, 18]
 ###############################################################################
 
+# S = [x0, ..... x(start), x(start + 1), ...., x(end), x(end + 1), ...]
+# To hočemo urediti tako, da bo x(start) pivot, ki bo nekje na sredini tiste podtabele, ki oj želimo preurediti. Vsi na levi bodo 
+# manjši iz seznama S od x(start), na desni vsi večji iz S.
+# Potem izberemo nov pivot na začetku prve polovice, za start in ko nec nastavimo strat in konec prve polovic3e seznama in uredimo to polovico. Isto
+# uredimo še zgornjo polovico. Ponavljamo.
+
+'''def pivot (a, start, end):
+    p = a[start]
+    seznam = []
+    seznam_vecjih = []
+    for i in a[: start]:
+        seznam.append(i)
+    for i in a[(start +1) : (end + 1)]:
+        if i <= p:
+            seznam.append(i)
+        else:
+            seznam_vecjih.append(i)
+    k = len(seznam)
+    seznam.append(p)
+    seznam += seznam_vecjih
+    for i in a[(end + 1):]:
+        seznam.append(i)
+    a = seznam
+    return seznam'''
+# Tole je moja koda, ni OK, ker ne pivotira na mestu, ampak sestavlja nov seznam!!!!!!
+
+def pivot(a, start, end):
+    if end <= start:
+        #Nothing to do, bad input
+        return start
+    # We have an in dex that tells us where the first element larger
+    # than the pivot is and we maintain that variant throughout the loop.
+    first_larger = start + 1
+    for i in range(start, end + 1):
+        if a[i] < a[start]:
+            # This element needs to end up on the left side of the pivot
+            a[first_larger], a[i] = a[i], a[first_larger]
+            # Switch it with the 'first_larger' element and update the index.
+            first_larger += 1
+    # Move the pivot to the right place
+    # Swap its position with the last smaller element
+    a[start], a[first_larger - 1] = a[first_larger - 1], a[start]
+    return first_larger - 1
+
 
 
 ###############################################################################
@@ -44,6 +90,33 @@
 # jo rešite brez da v celoti uredite tabelo [a].
 ###############################################################################
 
+def kth_element(a, k):
+    lower = 0
+    upper = len(a) - 1
+    while True:
+        # See if the first element of the sublist is the k-th
+        candidate_i = pivot(a, lower, upper)
+        # candidate_i je indeks, na katerem je pivot po urejanju
+        if candidate_i == k:
+            return a[candidate_i]
+        elif candidate_i < k:
+            # We continue searching amongst larger elements
+            lower = candidate_i + 1
+        else:
+            # We continue searching amongst smaller elements
+            upper = candidate_i - 1
+
+def kth_element_with_recursion(a, k):
+    def kth(lower, upper):
+        candidate_i = pivot(a, lower, upper)
+        if candidate_i == k:
+            return a[candidate_i]
+        elif candidate_i < k:
+            return kth(candidate_i + 1, upper)
+        else:
+            return kth(lower, candidate_i - 1)
+    return kth(0, len(a)-1)
+
 
 
 ###############################################################################
@@ -59,8 +132,41 @@
 #     >>> quicksort(a)
 #     [2, 3, 4, 5, 10, 11, 15, 17, 18]
 ###############################################################################
+'''
+def quicksort_part(a, start, end):
+    if start >= end:
+        return 'ni dobro'
+    elif end == start + 1:
+        return a
+    else:
+        b = pivot(a, start, end)
+        zg_meja_spodnjega = b - 1
+        sp_meja_zgornjega = b + 1
+        return quicksort_part(a, start, end)'''
 
 
+def quicksort(a):
+    def qsort(a, s, e):
+        # Check if done (if there is one or less elements)
+        if e <= s:
+            return 
+        # pivot
+        p_i = pivot(a, s, e)
+        # Sort smaller than pivot
+        qsort(a, s, p_i-1)
+        # Sort bigger than pivot
+        qsort(a, p_i+1, e)
+    qsort(a, 0, len(a) - 1)
+
+def test_quicksort():
+    for _ in range(1000):
+        a = [random.randint(-10000, 100000) for _ in range(100)]
+        b1 = a[:]
+        b2 = a[:]
+        quicksort(b1)
+        b2.sort()
+        if b1 != b2:
+            return "Not working"
 
 ###############################################################################
 # Če imamo dve urejeni tabeli, potem urejeno združeno tabelo dobimo tako, da
@@ -85,7 +191,26 @@
 #
 ###############################################################################
 
-
+def zlij(target, begin, end, list_1, list_2):
+    l1 = len(list_1)
+    l2 = len(list_2)
+    i1 = 0
+    i2 = 0
+    while (i1 < l1 and i2 < l2):
+        e1 = list_1[i1]
+        e2 = list_2[i2]
+        if(e1 < e2):
+            target[begin + i1 + i2] = e1
+            i1 += 1
+        else:
+            target[begin + i1 + i2] = e2
+            i2 += 1
+    while i1 < l1:
+        target[begin + i1 + i2] = list_1[i1]
+        i1 += 1 
+    while i2 < l2:
+        target[begin + i1 + i2] = list_2[i2]
+        i2 += 1
 
 ###############################################################################
 # Tabelo želimo urediti z zlivanjem (merge sort). 
