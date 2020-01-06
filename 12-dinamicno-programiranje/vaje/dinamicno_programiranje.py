@@ -40,3 +40,35 @@ def max_cheese(cheese_matrix):
 			  return
 	loop (max_i-1, max_j-1)
 	return max_matrix[0][0]
+
+from functools import lru_cache
+
+def max_cheese2(cheese_matrix):
+	max_i = len(cheese_matrix) 
+	max_j = len(cheese_matrix[0])
+
+	def mouse(i, j):
+		cheese = cheese_matrix[i][j]
+		# Namesto da bi računali max_matrix, se kar rekurzivno pokličemo na mouse:
+		max_right = mouse(i, j+1) if j < (max_j-1) else 0
+		max_down = mouse(i+1, j) if i < (max_i-1) else 0
+		return cheese + max(max_down, max_right)
+	
+	return mouse(0,0)
+	
+# Veliko počasnejša funkcija od max_cheese, ker računa vse za dol in vse za desno vsakič, max_cheese pa le po eno vrednost naenkrat računa.
+# Zato bomom uporabili dekorator:
+
+def max_cheese3(cheese_matrix):
+	max_i = len(cheese_matrix) 
+	max_j = len(cheese_matrix[0])
+
+	@lru_cache(maxsize = 250)
+	# Tale maxsize je, koliko prosotra bomo rabili. Je potreben argument.
+	def mouse(i, j):
+		cheese = cheese_matrix[i][j]
+		max_right = mouse(i, j+1) if j < (max_j-1) else 0
+		max_down = mouse(i+1, j) if i < (max_i-1) else 0
+		return cheese + max(max_down, max_right)
+
+	return mouse(0,0)
