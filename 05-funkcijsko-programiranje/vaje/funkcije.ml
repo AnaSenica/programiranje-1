@@ -88,7 +88,7 @@ let rec map_tlrec f seznam =
   def mapi(f, list):
       mapi_list = []
       index = 0
-      for x in list:
+      for x in list:k
           mapi_list += [f(x, index)]
           index += 1
       return mapi_list
@@ -109,7 +109,7 @@ let rec mapi f seznam =
 
 (*----------------------------------------------------------------------------*]
  Funkcija [zip] sprejme dva seznama in vrne seznam parov istoležnih
- elementov podanih seznamov. Če seznama nista enake dolžine vrne napako.
+ elementov podanih seznamov. Če seznama nista enake dolžine, vrne napako.
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  # zip [1; 1; 1; 1] [0; 1; 2; 3];;
  - : (int * int) list = [(1, 0); (1, 1); (1, 2); (1, 3)]
@@ -121,7 +121,8 @@ let rec zip sez1 sez2 =
   let rec zip' sez1 sez2 acc =
     match sez1, sez2 with
       | [], [] -> reverse acc
-      | [], x :: xs | x :: xs, [] -> failwith "Seznama sta razlicnih dolzin!" (* Bolje: namesto x :: xs v tej vrsti damo raje _, ker to pomeni katerokoli spremenljivko, brez imena*)
+      | [], x :: xs | x :: xs, [] -> failwith "Seznama sta razlicnih dolzin!" 
+      (* Bolje: namesto x :: xs v tej vrsti damo raje _, ker to pomeni katerokoli spremenljivko, brez imena. *)
       | x :: xs, y :: ys -> zip' xs ys ((x, y) :: acc)
   in zip' sez1 sez2 []
 

@@ -57,7 +57,7 @@ let rec multiply' = function
   | x :: xs -> x * (multiply' xs)
 
 (*----------------------------------------------------------------------------*]
- Napišite funkcijo ekvivalentno python kodi:
+ Napišite funkcijo, ekvivalentno python kodi:
 
   def sum_int_pairs(pair_list):
       if len(pair_list) == 0:
@@ -91,7 +91,7 @@ let rec get k seznam =
    | [] -> failwith "Seznam je prazen!"
    | x :: xs -> if k <= 0 then x else get (k-1) xs
 
-(* Če bi hoteli tu vpisati za k npr. -2, moramo dati okoli oklepaje, ker sta to dva zanka: torej 'get (-2) seznam'*)
+(* Če bi hoteli tu vpisati za k npr. -2, moramo dati okoli oklepaje, ker sta to dva znaka: torej 'get (-2) seznam'*)
 
 let rec get' k seznam =
   match seznam with 
@@ -184,7 +184,7 @@ let rec remove a seznam =
                  else x :: remove a xs
 
 (*----------------------------------------------------------------------------*]
- Funkcija [is_palindrome] za dani seznam ugotovi ali predstavlja palindrom.
+ Funkcija [is_palindrome] za dani seznam ugotovi, ali predstavlja palindrom.
  Namig: Pomagaj si s pomožno funkcijo, ki obrne vrstni red elementov seznama.
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  # is_palindrome [1; 2; 3; 2; 1];;
