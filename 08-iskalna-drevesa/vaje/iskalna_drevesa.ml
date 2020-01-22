@@ -67,7 +67,7 @@ let rec size = function
 
 (*----------------------------------------------------------------------------*]
  Funkcija [map_tree f tree] preslika drevo v novo drevo, ki vsebuje podatke
- drevesa [tree] preslikane s funkcijo [f].
+ drevesa [tree], preslikane s funkcijo [f].
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  # map_tree ((<)3) test_tree;;
  - : bool tree =
@@ -94,7 +94,7 @@ let rec list_of_tree tree =
 		| Node (lt, x, rt) -> (list_of_tree lt) @ [x] @ (list_of_tree rt)
 
 (*----------------------------------------------------------------------------*]
- Funkcija [is_bst] preveri ali je drevo binarno iskalno drevo (Binary Search 
+ Funkcija [is_bst] preveri, ali je drevo binarno iskalno drevo (Binary Search 
  Tree, na kratko BST). Predpostavite, da v drevesu ni ponovitev elementov, 
  torej drevo npr. ni oblike Node( leaf 1, 1, leaf 2)). Prazno drevo je BST.
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -139,8 +139,8 @@ let rec is_bst tree =
 		| Node (Node (lt, y, rt), x, Empty) -> if x > y then is_bst (Node (lt, y, rt)) else false
 		| Node (Empty, x, Node (lt, y, rt)) -> if x < y then is_bst (Node (lt, y, rt)) else false
 		| Node (Node (lt1, y, rt1), x, Node (lt2, z, rt2)) -> if x > y then 
-																														if z > x then is_bst (Node (lt1, y, rt1));	is_bst (Node (lt2, z, rt2)) else false
-																											else false*)
+					if z > x then is_bst (Node (lt1, y, rt1));	is_bst (Node (lt2, z, rt2)) else false
+				else false*)
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  V nadaljevanju predpostavljamo, da imajo dvojiška drevesa strukturo BST.
@@ -148,7 +148,7 @@ let rec is_bst tree =
 
 (*----------------------------------------------------------------------------*]
  Funkcija [insert] v iskalno drevo pravilno vstavi dani element. Funkcija 
- [member] preveri ali je dani element v iskalnem drevesu.
+ [member] preveri, ali je dani element v iskalnem drevesu.
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  # insert 2 (leaf 4);;
  - : int tree = Node (Node (Empty, 2, Empty), 4, Empty)
@@ -224,7 +224,7 @@ let pred = function
  izbriše element [x], če ta v drevesu obstaja. Za vajo lahko implementirate
  oba načina brisanja elementov.
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- # (*<< Za [delete] definiran s funkcijo [succ]. >>*)
+ # (*<< Za [delete], definiran s funkcijo [succ]. >>*)
  # delete 7 test_tree;;
  - : int tree =
  Node (Node (Node (Empty, 0, Empty), 2, Empty), 5,

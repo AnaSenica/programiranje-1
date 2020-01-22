@@ -67,8 +67,8 @@ end
  Napišite implementacijo modula [Nat_int], ki zgradi modul s signaturo [NAT],
  kjer kot osnovni tip uporablja OCamlov tip [int].
 
- Namig: Dokler ne implementirate vse funkcij v [Nat_int] se bo OCaml pritoževal.
- Temu se lahko izognete tako, da funkcije, ki še niso napisane nadomestite z 
+ Namig: Dokler ne implementirate vseh funkcij v [Nat_int], se bo OCaml pritoževal.
+ Temu se lahko izognete tako, da funkcije, ki še niso napisane, nadomestite z 
  [failwith "later"], vendar to ne deluje za konstante.
 [*----------------------------------------------------------------------------*)
 
@@ -178,7 +178,7 @@ let seven = Nat_peano.of_int 7
 
 (*----------------------------------------------------------------------------*]
  V OCamlu lahko module podajamo kot argumente funkcij, z uporabo besede
- [module]. Funkcijo, ki sprejme modul torej definiramo kot
+ [module]. Funkcijo, ki sprejme modul, torej definiramo kot
 
  # let f (module M : M_sig) = ...
 
@@ -189,7 +189,7 @@ let seven = Nat_peano.of_int 7
  Funkcija [sum_nat_100] sprejme modul tipa [NAT] in z uporabo modula sešteje
  prvih 100 naravnih števil. Ker funkcija ne more vrniti rezultata tipa [NAT.t]
  (saj ne vemo, kateremu od modulov bo pripadal, torej je lahko [int] ali pa
-  variantni tip) na koncu vrnemo rezultat tipa [int] z uporabo metode [to_int].
+  variantni tip), na koncu vrnemo rezultat tipa [int] z uporabo metode [to_int].
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  # sum_nat_100 (module Nat_int);;
  - : int = 4950
