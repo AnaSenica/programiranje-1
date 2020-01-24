@@ -34,7 +34,7 @@ let rec randlist len max =
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  Sedaj lahko s pomočjo [randlist] primerjamo našo urejevalno funkcijo (imenovana
  [our_sort] v spodnjem primeru) z urejevalno funkcijo modula [List]. Prav tako
- lahko na manjšem seznamu preverimo v čem je problem.
+ lahko na manjšem seznamu preverimo, v čem je problem.
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  let test = (randlist 100 100) in (our_sort test = List.sort compare test);;
 [*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*)
@@ -85,10 +85,10 @@ let rec insert y xs =
 		else y :: x :: xs
 	
 let insert_tlrec y xs =
-	let rec insert'  acc = function
+	let rec insert' acc = function
   	| [] -> List.rev (y :: acc)
-		(*val rev : 'a list -> 'a list
-		List reversal.*)
+		(* val rev : 'a list -> 'a list
+		List reversal. *)
   	| x :: xs -> 			
 			if x < y then 
 				insert' (x :: acc) xs
@@ -163,7 +163,7 @@ let rec min_and_rest = function
  zaporedoma prenašamo najmanjši element neurejenega podseznama v urejen
  podseznam, dokler ne uredimo vseh. 
 
- Če pričnemo z praznim urejenim podseznamom, vemo, da so na vsakem koraku vsi
+ Če pričnemo s praznim urejenim podseznamom, vemo, da so na vsakem koraku vsi
  elementi neurejenega podseznama večji ali enaki elementom urejenega podseznama,
  saj vedno prenesemo najmanjšega. Tako vemo, da moramo naslednji najmanjši člen
  dodati na konec urejenega podseznama.
@@ -189,12 +189,12 @@ let rec selection_sort xs =
 [*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
- Pri delu z tabelami (array) namesto seznami, lahko urejanje z izbiranjem 
+ Pri delu s tabelami (array) namesto seznami lahko urejanje z izbiranjem 
  naredimo "na mestu", t.j. brez uporabe vmesnih kopij (delov) vhoda. Kot prej
  tabelo ločujemo na že urejen del in še neurejen del, le da tokrat vse elemente
  hranimo v vhodni tabeli, mejo med deloma pa hranimo v spremenljivki
  [boundary_sorted]. Na vsakem koraku tako ne izvlečemo najmanjšega elementa
- neurejenga dela tabele temveč poiščemo njegov indeks in ga zamenjamo z
+ neurejenga dela tabele, temveč poiščemo njegov indeks in ga zamenjamo z
  elementom na meji med deloma (in s tem dodamo na konec urejenega dela).
  Postopek končamo, ko meja doseže konec tabele.
 [*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*)
@@ -289,7 +289,7 @@ let selection_sort_array a =
 			(* Everything is sorted! *)
 			() 
 		else
-			(* Find the minimal elemnt in the rest of the list and swap it with the element on the lower end of the
+			(* Find the minimal element in the rest of the list and swap it with the element on the lower end of the
 			'to be sorted' part of the list. *)
 			let mini = index_min a lower (len - 1) in
 			let () = swap1 a lower mini in
@@ -303,3 +303,4 @@ let rec array_tester our_sort len =
 	let test_array = Array.of_list test in
 	let () = our_sort test_array in
 	Array.to_list test_array = List.sort compare test
+

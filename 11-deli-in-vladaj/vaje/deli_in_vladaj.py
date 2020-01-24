@@ -30,9 +30,9 @@ import random
 ###############################################################################
 
 # S = [x0, ..... x(start), x(start + 1), ...., x(end), x(end + 1), ...]
-# To hočemo urediti tako, da bo x(start) pivot, ki bo nekje na sredini tiste podtabele, ki oj želimo preurediti. Vsi na levi bodo 
+# To hočemo urediti tako, da bo x(start) pivot, ki bo nekje na sredini tiste podtabele, ki jo želimo preurediti. Vsi na levi bodo 
 # manjši iz seznama S od x(start), na desni vsi večji iz S.
-# Potem izberemo nov pivot na začetku prve polovice, za start in ko nec nastavimo strat in konec prve polovic3e seznama in uredimo to polovico. Isto
+# Potem izberemo nov pivot na začetku prve polovice, za start in konec nastavimo start in konec prve polovice seznama in uredimo to polovico. Isto
 # uredimo še zgornjo polovico. Ponavljamo.
 
 '''def pivot (a, start, end):
@@ -59,7 +59,7 @@ def pivot(a, start, end):
     if end <= start:
         #Nothing to do, bad input
         return start
-    # We have an in dex that tells us where the first element larger
+    # We have an index that tells us where the first element larger
     # than the pivot is and we maintain that variant throughout the loop.
     first_larger = start + 1
     for i in range(start, end + 1):
@@ -73,6 +73,22 @@ def pivot(a, start, end):
     a[start], a[first_larger - 1] = a[first_larger - 1], a[start]
     return first_larger - 1
 
+# a = [10, 4, 5, 15, 11, 2, 17, 0, 18]
+# pivot(a, 1, 7)
+# Pivotiramo od a[0] = 4 do  vključno a[7] = 0, pivot je 4, first_larger je a[2] = 5. Tega ne premaknemo nikamor.
+# Začnemo pri a[1] = 4. Ta ni manjši od 4, zato preskočimo. Isto za a[2] = 5, a[3] = 15, a[4] = 11.
+# a[5] = 2 je < 4, zato ga zamenjamo s prvim večjim od 4: z a[2] = 5: 
+# [10, 4, 2, 15, 11, 5, 17, 0, 18]
+# first_larger je zdaj 3 (<- indeks), a[first_larger] = 15.
+# Nadaljujemo. Start in end sta še vedno enaka, a[start] = 4, a[end] = 0, samo first_larger smo povečali. i je zdaj na 6,
+# a[6] = 17. Ta je večji od 4, zato ga pustimo na miru. Pridemo do i = 7, a[i] = 0 < 4. Zamenjamo a[first_larger] = 15 in 
+# a[i] = 0, dobim:
+# [10, 4, 2, 0, 11, 5, 17, 15, 18].
+# To je konec zanke, vsi manjši od 4 so zraven 4, potem so pa večji od 4. Radi bi še to 4 postavili na sredino, med manjše
+# in večje. Zato vzamemo indeks first_larger - 1 = 2, ki je zadnji element, manjši od 4, a[first_larger - 1] = 0. Zamenjamo
+# ga s 4:
+# [10, 0, 2, 4, 11, 5, 17, 15, 18].
+# Vrnemo first_larger - 1 = 3, na katerem je zdaj pivot: a[first_larger - 1] = 4.
 
 
 ###############################################################################
@@ -87,7 +103,7 @@ def pivot(a, start, end):
 #
 # Sestavite funkcijo [kth_element(a, k)], ki v tabeli [a] poišče [k]-ti
 # element po velikosti. Funkcija sme spremeniti tabelo [a]. Cilj naloge je, da
-# jo rešite brez da v celoti uredite tabelo [a].
+# jo rešite, brez da v celoti uredite tabelo [a].
 ###############################################################################
 
 def kth_element(a, k):
@@ -95,6 +111,9 @@ def kth_element(a, k):
     upper = len(a) - 1
     while True:
         # See if the first element of the sublist is the k-th
+        # Funkcija pivot namreč vrne mesto pivota potem, ko pivotiramo. To je točno to, kar hočemo, ker ničti element nastavimo za pivot,
+        # nato pivotiramo, na koncu je ničti element nekje na sredini, vsi manjši so pred njim, večji pa za njim. Dobimo indeks, na katerem
+        # je zdaj naš prvi element, ki hkrati pove, kateri po velikosti je (vsi manjši so pred njim, večji za njim).
         candidate_i = pivot(a, lower, upper)
         # candidate_i je indeks, na katerem je pivot po urejanju
         if candidate_i == k:
@@ -144,14 +163,17 @@ def quicksort_part(a, start, end):
         sp_meja_zgornjega = b + 1
         return quicksort_part(a, start, end)'''
 
+# Pomožno funkcijo smo napisali kar znotraj glavne:
 
 def quicksort(a):
     def qsort(a, s, e):
         # Check if done (if there is one or less elements)
         if e <= s:
             return 
-        # pivot
+        # pivotđ
         p_i = pivot(a, s, e)
+        # S tem, ko pokličem funkcijo pivot, mi bo že ta uredila seznam tako, da bo pivot na pravem mestu. Mogoče pa vsi manjši in vsi
+        # večji en bodo prav urejeni, zato uredimo še spodnji in zgornji del seznama.
         # Sort smaller than pivot
         qsort(a, s, p_i-1)
         # Sort bigger than pivot
@@ -163,7 +185,9 @@ def test_quicksort():
         a = [random.randint(-10000, 100000) for _ in range(100)]
         b1 = a[:]
         b2 = a[:]
+        # naša funkcija:
         quicksort(b1)
+        # vgrajena Pythonova funkcija:
         b2.sort()
         if b1 != b2:
             return "Not working"
@@ -177,7 +201,7 @@ def test_quicksort():
 # Funkcija naj deluje v času O(n), kjer je n dolžina tarčne tabele.
 # 
 # Sestavite funkcijo [zlij(target, begin, end, list_1, list_2)], ki v del 
-# tabele [target] med start in end zlije tabeli [list_1] in [list_2]. V primeru, 
+# tabele [target] med begin in end zlije tabeli [list_1] in [list_2]. V primeru, 
 # da sta elementa v obeh tabelah enaka, naj bo prvi element iz prve tabele.
 # 
 # Primer:
@@ -206,9 +230,11 @@ def zlij(target, begin, end, list_1, list_2):
             target[begin + i1 + i2] = e2
             i2 += 1
     while i1 < l1:
+        # Tu smo že porabili vse elemente iz list_2, zato samo še dodajamo elemente iz list_1. Tu je i2 že enak l2.
         target[begin + i1 + i2] = list_1[i1]
         i1 += 1 
     while i2 < l2:
+        # Tu smo že porabili vse elemente iz list_1, zato samo še dodajamo elemente iz list_2.
         target[begin + i1 + i2] = list_2[i2]
         i2 += 1
 
@@ -227,3 +253,20 @@ def zlij(target, begin, end, list_1, list_2):
 # >>> mergesort(a)
 # [2, 3, 4, 5, 10, 11, 15, 17, 18]
 ###############################################################################
+
+def mergesort(a):
+    def merge_pomozna(sez):
+        if sez == []:
+            return []
+        elif len(sez) == 1:
+            return sez
+        else:
+            middle = len(sez)//2
+            seznam1 = sez[0: middle]
+            seznam2 = sez[middle :]
+            merge_pomozna(seznam1)
+            merge_pomozna(seznam2)
+            zlij(sez, 0, len(sez), seznam1, seznam2)
+    return merge_pomozna(a)
+a = [10, 4, 5, 15, 11, 3, 17, 2, 18]
+mergesort(a)

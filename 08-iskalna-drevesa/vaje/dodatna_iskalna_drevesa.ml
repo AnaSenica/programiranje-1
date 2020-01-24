@@ -1,6 +1,36 @@
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  DODATNE VAJE 
 [*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*)
+type 'a tree =
+	| Node of 'a tree * 'a * 'a tree
+	| Empty
+
+let leaf x = Node (Empty, x, Empty)
+
+let rec list_of_tree tree =
+	match tree with
+		| Empty -> []
+		| Node (lt, x, rt) -> (list_of_tree lt) @ [x] @ (list_of_tree rt)
+    
+let rec is_bst t =
+  let rec list_is_ordered = function
+    | [] | _ :: [] -> true
+    | x :: y :: tl -> if x <= y then list_is_ordered (y :: tl) else false
+  in t |> list_of_tree |> list_is_ordered
+
+let rec insert s tree =
+	match tree with
+	| Empty -> leaf s
+	| Node (lt, y, rt) when s < y -> Node (insert s lt, y, rt)
+	| Node (lt, y, rt) -> Node (lt, y, insert s rt)
+
+let test_tree =
+	Node(
+		Node (leaf 0, 2, Empty),
+		5,
+		Node (leaf 6, 7, leaf 11)
+	)
+(* Vse zgornje funkcije so iz dokumenta iskalna_drevesa. *)
 
 (*----------------------------------------------------------------------------*]
  Funkcija [bst_of_list] iz seznama naredi dvojiško iskalno drevo.
@@ -9,6 +39,12 @@
  - : bool = true
 [*----------------------------------------------------------------------------*)
 
+let bst_of_list seznam =
+    let rec bst_of_list' sez acc_drevo =
+        match sez with
+        | [] -> acc_drevo
+        | x :: xs -> bst_of_list' xs (insert x acc_drevo)
+    in bst_of_list' seznam Empty
 
 (*----------------------------------------------------------------------------*]
  Funkcija [tree_sort] uredi seznam s pomočjo pretvorbe v bst in nato nazaj
@@ -20,11 +56,14 @@
  - : string list = ["a"; "b"; "c"; "d"; "e"; "f"]
 [*----------------------------------------------------------------------------*)
 
+let tree_sort seznam =
+    let tree = bst_of_list seznam in
+    list_of_tree tree
 
 (*----------------------------------------------------------------------------*]
  Funkcija [follow directions tree] tipa [direction list -> 'a tree -> 'a option]
- sprejme seznam navodil za premikanje po drevesu in vrne vozlišče do katerega 
- vodi podana pot. Ker navodila morda ne vodijo do nobenega vozlišča v drevesu
+ sprejme seznam navodil za premikanje po drevesu in vrne vozlišče, do katerega 
+ vodi podana pot. Ker navodila morda ne vodijo do nobenega vozlišča v drevesu,
  vrne rezultat kot [option] tip. Ne pozabite definirati tipa [directions].
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  # follow [Right; Left] test_tree;;
@@ -32,7 +71,18 @@
  # follow [Right; Left; Right; Right] test_tree;;
  - : int option = None
 [*----------------------------------------------------------------------------*)
+type directions =
+    | Left
+    | Right
 
+let rec follow directions tree =
+    match tree with
+    | Empty -> None
+    | Node (lt, x, rt) ->
+        match directions with
+        | [] -> Some x
+        | y :: ys -> if y = Left then follow ys lt else follow ys rt
+            
 
 (*----------------------------------------------------------------------------*]
  Funkcija [prune directions tree] poišče vozlišče v drevesu glede na navodila,
@@ -45,6 +95,20 @@
  - : int tree option =
  Some (Node (Node (Node (Empty, 0, Empty), 2, Empty), 5, Empty))
 [*----------------------------------------------------------------------------*)
+
+let rec prune directions tree =
+    match directions, tree with
+    | [], _ -> Some Empty
+    | x :: xs, Empty -> None
+    | Left :: xs, Node (lt, y, rt) -> (
+        match prune xs lt with
+        | None -> None
+        | Some new_l -> Some (Node(new_l, y, rt)) 
+    )
+    | Right :: xs, Node(lt, y, rt) -> (
+        match prune xs rt with
+        |None -> None
+        | Some new_l -> Some (Node(lt, y, new_l)))
 
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]

@@ -305,6 +305,17 @@ let rec dict_get key = function
  - : unit = ()
 [*----------------------------------------------------------------------------*)
 
+let rec print_dict drevo =
+	match drevo with
+	| Empty -> ()
+	| Node (lt, (k, v), rt) -> (
+		print_dict lt;
+		print_string (k ^ " : "); 
+		print_int v;
+		print_newline ();
+		print_dict rt)
+
+
 
 (*----------------------------------------------------------------------------*]
  Funkcija [dict_insert key value dict] v slovar [dict] pod ključ [key] vstavi
@@ -325,3 +336,9 @@ let rec dict_get key = function
  - : unit = ()
 [*----------------------------------------------------------------------------*)
 
+let rec dict_insert key value dict =
+	match dict with
+	| Empty -> leaf (key, value)
+	| Node (lt, (k, v), rt) when key < k -> Node(dict_insert key value lt, (k, v), rt)
+	| Node (lt, (k, v), rt) when k < key -> Node (lt, (k, v), dict_insert key value rt)
+	| Node (lt, (k, v), rt) (* k = key *)-> Node (lt, (key, value), rt)
