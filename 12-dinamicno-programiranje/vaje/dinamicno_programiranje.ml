@@ -22,7 +22,7 @@ let test_matrix =
      [| 7 ; 0 ; 1 |] |]
 
 (* 
-V tej matriki i,j pomenita, koliko sira je nqa (i,j)-tem mestu v matriki.
+V tej matriki i,j pomenita, koliko sira je na (i,j)-tem mestu v matriki.
 Mi pa bomo imeli novo matriko, v katero bomo na (i,j)-to mesto shranjevali, koliko max sira
 naberemo, če začnemo na (i, j)-tem mestu. Začnemo spodaj desno, kjer naberemo 1 sir, in gremo gor ali levo.
 [| [| 13 ; 12 ; 6 |];
@@ -125,7 +125,7 @@ let alternating_towers h =
     | 2 -> 1
     | 3 -> 2
     *)
-    | h -> (* Rdeč gradnik je 1 *) red_mem.(h-2) + (* Rdeč gradnik je 2 *) red_mem.(h-3)
+    | h -> (* Moder gradnik je 2 *) red_mem.(h-2) + (* Moder gradnik je 3 *) red_mem.(h-3)
   in
   (* 4. Loop over all values in the correct order *)
   let rec loop i =

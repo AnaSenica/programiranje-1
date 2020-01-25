@@ -23,6 +23,12 @@ S tremi ti namreč ne najde prave relativne poti do datotek.
             # fold_left_no_acc (^) ["F"; "I"; "C"; "U"; "S"];;
             - : string = "FICUS"
 
+        Razlika med fold_left in fold_right:
+        # List.fold_right (-) [1;2;3] 0;;  (* 1 - (2 - (3 - 0)) *)
+        - : int = 2
+        # List.fold_left (-) 0 [1;2;3];;   (* ((0 - 1) - 2) - 3 *)
+        - : int = -6
+
 
     FUNKCIJE:
         Definiram jih tako: let plus_dve = (fun x -> x + 2)

@@ -8,14 +8,14 @@ type comparison = LT | EQ | GT
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  Prioriteto definiramo s pomočjo modula primerjav. Želimo, da je implementacija
- tipa [t] vidna, saj potrebujemo tip za uporabo funktorjev. Ker pa ne vemo 
+ tipa [t] vidna, saj potrebujemo tip za uporabo funktorjev. Ker pa ne vemo,
  katere tipe bomo primerjali, jo za ta trenutek pustimo abstraktno.
 [*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*)
 
 module type Comparable = sig
     type t
     val compare : t -> t -> comparison
-  end
+end
 
 (*----------------------------------------------------------------------------*]
  Napiši modul za primerjavo celih števil. Primerjaj nekaj celih števil.
@@ -23,11 +23,15 @@ module type Comparable = sig
 
 module Cmp_Int = struct
   type t = int
-  let compare x y = failwith "to do"
+  let compare x y = 
+      if x < y then LT else
+      if x > y then GT else
+      EQ    
 end
+  
 
 (*----------------------------------------------------------------------------*]
- Ko modulu predpišemo signaturo, je potrebno paziti katere tipe naredimo
+ Ko modulu predpišemo signaturo, je potrebno paziti, katere tipe naredimo
  abstraktne. Če je tip abstrakten v signaturi, ga lahko kljub temu 'razkrijemo'
  s pomočjo [with type t = int], ko to potrebujemo. Preverite, da je to res
  potrebno!
@@ -44,6 +48,13 @@ module Cmp_Int_prescribed = (Cmp_Int : Comparable with type t = int)
  Funkcija [Pervasives.compare s t] vrne -1 če je s < t, 0 če s = t in 1 za s > t
 [*----------------------------------------------------------------------------*)
 
+module Cmp_String = struct
+  type t = string
+  let compare st1 st2 = 
+    if Pervasives.compare st1 st2 = 1 then GT else
+    if Pervasives.compare st1 st2 = -1 then LT else
+    EQ
+end
 
 (*----------------------------------------------------------------------------*]
  Funktor je preslikava iz modula v modul. Sedaj definiraj funktor, ki sprejme
@@ -55,12 +66,12 @@ module Cmp_Int_prescribed = (Cmp_Int : Comparable with type t = int)
  modula ujema s tipom modula, ki ga podamo kot argument
 [*----------------------------------------------------------------------------*)
 
-(*
-module Cmp_inv (Cmp : Comparable) : Comparable with type t = Cmp.t  = struct
+
+(*module Cmp_inv (Cmp : Comparable) : Comparable with type t = Cmp.t  = struct
   type t = ...
   let compare x y = ...
-end
- *)
+end*)
+ 
 
 (*----------------------------------------------------------------------------*]
  Funktor uporabljamo podobno kot funkcije, le da v tem primeru potrebujemo

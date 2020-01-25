@@ -289,11 +289,12 @@ module Polar : COMPLEX = struct
 
   let zero = {magn = 0.; arg = 0.}
   let one = {magn = 1.; arg = 0.}
-  let i = {magn = 1.; arg = pi/.2}
+  let i = {magn = 1.; arg = pi/.2.}
 
   let negacija x = {magn = x.magn ; arg = x.arg +. pi}
   let konjugacija x = {magn = x.magn ; arg = -. x.arg}
-  let sestevanje x y =
+  let sestevanje x y = failwith "later"
+  let mnozenje x y = failwith "later"
 end
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
@@ -310,6 +311,47 @@ end
  [print] (print naj ponovno deluje zgolj na [(string, int) t].
 [*----------------------------------------------------------------------------*)
 
+module type DICT = sig
+  type ('key, 'value ) t
+  val empty : ('key, 'value ) t
+  val get : 'key -> ('key, 'value ) t -> 'value option
+  val insert : 'key -> 'value -> ('key, 'value ) t -> ('key, 'value ) t
+  val print : (string, int) t -> unit
+end
+
+module Tree_dict : DICT = struct
+
+  type ('key, 'value ) t =
+    | Node of (('key, 'value) t) * 'key * 'value * (('key, 'value) t)
+	  | Empty
+  
+  let empty = Empty
+  
+  let leaf key value = Node (Empty, key, value, Empty)
+
+  let rec get key = function
+	  | Empty -> None
+	  | Node (lt, k, v, rt) when key < k -> get key lt
+	  | Node (lt, k, v, rt) when key > k -> get key rt
+	  | Node (lt, k, v, rt) (* k= key*) -> Some v
+
+  let rec print drevo =
+	  match drevo with
+	  | Empty -> ()
+	  | Node (lt, k, v, rt) -> (
+		  print lt;
+		  print_string (k ^ " : "); 
+		  print_int v;
+  		print_newline ();
+	  	print rt)
+
+  let rec insert key value dict =  
+  	match dict with
+	    | Empty -> leaf key value
+    	| Node (lt, k, v, rt) when key < k -> Node(insert key value lt, k, v, rt)
+	    | Node (lt, k, v, rt) when k < key -> Node (lt, k, v, insert key value rt)
+	    | Node (lt, k, v, rt) (* k = key *)-> Node (lt, key, value, rt)
+end
 
 (*----------------------------------------------------------------------------*]
  Funkcija [count (module Dict) list] prešteje in izpiše pojavitve posameznih
@@ -323,4 +365,17 @@ end
 [*----------------------------------------------------------------------------*)
 ;;
 (*Tu na konec damo ;; da s ene sesuje zaradi tele spodnje funkcije, ko želimo preverjati rešitve*)
-let count (module Dict : DICT) list = ()
+
+let count (module Dict : DICT) list =
+  let koliko kljuc drevo = (Dict.get kljuc drevo) in
+    (* Funkcija koliko sprejme ključ in vrne vrednost, ki je option. *)
+  let rec drevo_iz_seznama seznam acc_drevo =
+    match seznam with
+    | [] -> acc_drevo
+    | x :: xs -> 
+      match koliko x acc_drevo with
+      | None -> drevo_iz_seznama xs (Dict.insert x 1 acc_drevo)
+      | Some stevilo -> drevo_iz_seznama xs (Dict.insert x (stevilo + 1) acc_drevo) 
+  in
+  Dict.print (drevo_iz_seznama list Dict.empty)
+    

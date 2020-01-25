@@ -46,6 +46,25 @@ let bst_of_list seznam =
         | x :: xs -> bst_of_list' xs (insert x acc_drevo)
     in bst_of_list' seznam Empty
 
+let bst_of_list_resitve list = List.fold_right insert list Empty
+(* fold_right deluje tako, da vzame funkcijo, seznam in neko vrednost 'a. Potem vzame zadnji element seznama in 'a in funkcijo uporabi na njiju.
+Potem vzame drugi element in vrednost, ki jo je dobil prej, in uporabi funkcijo na njiju itd.
+Primer:
+
+# bst_of_list_resitve [11; 6; 7; 0; 2; 5];;
+To je isto kot # List.fold_right insert [11; 6; 7; 0; 2; 5] Empty;;
+
+- : int tree =
+Node (Node (Node (Empty, 0, Empty), 2, Empty), 5,
+Node (Node (Empty, 6, Empty), 7, Node (Empty, 11, Empty)))
+
+insert je funkcija
+[11; 6; 7; 0; 2; 5] je seznam
+Empty je naša vrednost 'a
+Najprej vzamemo 5 in Empty in insertamo 5 v Empty. Dobimo Node(Empty, 5, Empty). Potem vzamemo 2 in jo insertamo v Node(Empty, 5, Empty).
+Dobimo Node ( Node (Empty, 2, Empty), 5, Empty). Tako nadaljujemo.
+*)
+
 (*----------------------------------------------------------------------------*]
  Funkcija [tree_sort] uredi seznam s pomočjo pretvorbe v bst in nato nazaj
  v seznam.
@@ -107,21 +126,25 @@ let rec prune directions tree =
     )
     | Right :: xs, Node(lt, y, rt) -> (
         match prune xs rt with
-        |None -> None
+        | None -> None
         | Some new_l -> Some (Node(lt, y, new_l)))
 
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  PHANTOM TREES
 
- Druga možnost pri brisanju podatkov je, da spremenimo tip s katerim
+ Druga možnost pri brisanju podatkov je, da spremenimo tip, s katerim
  predstavljamo drevo. Definirate nov tip fantomskega drevesa, ki poleg podatka,
  levega in desnega poddrevesa hrani še dodatno informacijo o stanju [state], ki
  je bodisi [Exists] če je vozlišče še prisotno in pa [Ghost] če je vozlišče v
  drevesu izbrisano in ga upoštevamo le še kot delitveno vozlišče. Še vedno
  predpostavljamo, da imajo drevesa obliko BST.
 [*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*)
+type state = Exists | Ghost
 
+type 'a phantom_tree =
+    | P_Empty
+    | P_Node of 'a phantom_tree * 'a * 'a phantom_tree * state
 
 (*----------------------------------------------------------------------------*]
  Funkcija [phantomize] tipa ['a tree -> 'a phantom_tree] navadnemu drevesu
@@ -143,6 +166,17 @@ let rec prune directions tree =
  P_Node (P_Node (P_Empty, 3, P_Empty, Ghost), 4, P_Empty, Exists), Exists)
 [*----------------------------------------------------------------------------*)
 
+let rec phantomize drevo =
+    match drevo with
+    | Empty -> P_Empty
+    | Node (lt, x, rt) -> P_Node (phantomize lt, x, phantomize rt, Exists)
+
+let rec kill x ptree =
+    match ptree with
+    | P_Empty -> P_Empty
+    | P_Node (plt, y, prt, s) when x < y -> P_Node (kill x plt, y, prt, s)
+    | P_Node (plt, y, prt, s) when y < x -> P_Node (kill x plt, y, prt, s)
+    | P_Node (plt, y, prt, s) -> P_Node (plt, y, prt, Ghost)
 
 (*----------------------------------------------------------------------------*]
  Funkcija [unphantomize] tipa ['a phantom_tree -> 'a tree] fantomskemu drevesu 
@@ -154,3 +188,16 @@ let rec prune directions tree =
  # test_tree |> phantomize |> kill 7 |> kill 0 |> kill 5 |> unphantomize;;
  - : int tree = Node (Node (Node (Empty, 2, Empty), 6, Empty), 11, Empty)
 [*----------------------------------------------------------------------------*)
+
+let unphantomize ptree =
+    let rec ptree_to_list ptree =
+        match ptree with
+        | P_Empty -> []
+        | P_Node (plt, x, prt, Exists) -> (ptree_to_list plt) @ [x] @ (ptree_to_list prt)
+        | P_Node (plt, x, prt, Ghost) -> (ptree_to_list plt) @ (ptree_to_list prt)
+    in bst_of_list (ptree_to_list ptree)
+
+let test = P_Node (P_Node (P_Node (P_Empty, 0, P_Empty, Exists), 2, P_Empty, Exists), 5,
+ P_Node (P_Node (P_Empty, 6, P_Empty, Exists), 7,
+ P_Node (P_Empty, 11, P_Empty, Exists), Exists),
+ Exists)
