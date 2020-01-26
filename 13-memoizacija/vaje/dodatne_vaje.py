@@ -17,11 +17,11 @@ def najdaljse_narascajoce_podzaporedje(sez):
         if i >= len(sez):
             return  []
         # Ali sprejmemo i-ti element? Odvisno od tega, kaj imamo že prej v seznamu. Zato imamo še
-        # v argumknetih funkcije argument 'prejšnji', ki nam pove, kateri je največji do sedaj.
+        # v argumentih funkcije argument 'prejšnji', ki nam pove, kateri je največji do sedaj.
         elif sez[i] < prejsnji:
             return seznam(prejsnji, i+1)
         else:
-            # sez[i] > prejsnji
+            # sez[i] >= prejsnji
             # vzamem element, ki je za i-tim, torej (i+1)-ti element:
             vzamem_prvega = [sez[i]] + seznam(sez[i], i+1)
             # (i+1)-ti element preskočim:
@@ -36,7 +36,8 @@ def najdaljse_narascajoce_podzaporedje(sez):
     else:
         return seznam(min(sez), 0)
        
-
+a = [2, 3, 6, 8, 4, 4, 6, 7, 12, 8, 9]
+najdaljse_narascajoce_podzaporedje(a)
 
 ###############################################################################
 # Nepreviden študent je pustil robotka z umetno inteligenco nenadzorovanega.
@@ -75,22 +76,39 @@ soba = [[0, 1, 0, 0, 2],
 def pobeg(soba, pozicija, koraki):
 
     @lru_cache(maxsize = 256)
-    def veljaven_nov_polozaj(nova_pozicija):
-        if nova_pozicija[0] < 0 or nova_pozicija[0] > len(soba):
+    def premik(pozicija, koraki):
+
+        prvi_primer = (pozicija[0], pozicija[1] + 1)
+        drugi_primer = (pozicija[0], pozicija[1] - 1)
+        tretji_primer = (pozicija[0] + 1, pozicija[1])
+        cetrti_primer = (pozicija[0] - 1, pozicija[1])
+
+        if pozicija[0] < 0 or pozicija[0] > (len(soba)-1):
             return False
-        elif nova_pozicija[1] < 0 or nova_pozicija[1] > len(soba[0]):
+        elif pozicija[1] < 0 or pozicija[1] > (len(soba[0])-1):
             return False
-        elif soba[nova_pozicija[0]][nova_pozicija[1]] == 2:
+        elif soba[pozicija[0]][pozicija[1]] == 2:
+            return False
+        elif soba[pozicija[0]][pozicija[1]] == 1:
+            return True
+        elif koraki == 0:
             return False
         else:
-            return True
-    
-    def premik(pozicija, koraki):
-        prvi_primer = pozicija[0] = pozicija[0] + 1
-        drugi_primer = pozicija[0] = pozicija[0] - 1
-        tretji_primer = pozicija[1] = pozicija[1] + 1
-        cetrti_primer = pozicija[1] = pozicija[1] - 1
-        pass
+            vzamem_prvega = premik(prvi_primer, koraki-1)
+            vzamem_drugega = premik(drugi_primer, koraki-1)
+            vzamem_tretjega = premik(tretji_primer, koraki-1)
+            vzamem_cetrtega = premik(cetrti_primer, koraki-1)
+            if vzamem_prvega == True:
+                return True
+            elif vzamem_drugega == True:
+                return True
+            elif vzamem_tretjega == True:
+                return True
+            elif vzamem_cetrtega == True:
+                return True
+            else:
+                return False
 
+    return premik(pozicija, koraki)
 
-    return None
+pobeg(soba, (3,1), 5)

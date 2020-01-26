@@ -79,6 +79,7 @@ let max_cheese cheese_matrix =
         ()
   in
   let () = loop (max_i-1) (max_j-1) in
+  (* Na koncu vrnemo prvo polje v matriki. *)
   max_matrix.(0).(0)
 
 
@@ -171,6 +172,43 @@ let articles = [|
 |]
 
 
+
+let best_value articles max_w =
+    (* Choose the item if you can and recursively search further. *)
+  let rec get_item acc_w acc_p (_, p, w) =
+    if acc_w +. w > max_w then
+      (* Item is not suitable, return what we got so far.*)
+      acc_p
+    else
+      (* Find best value after choosing the item. *)
+      shopper (acc_w +. w) (acc_p +. p)
+  (* Choose every item in the list and return the value of the best choice. *)
+  and shopper w p =
+    let choices = Array.map (get_item w p) articles in
+        (* Funkcijo get_item uporabim za trenutno skupno težo in ceno na vseh elementih v articles. *)
+    Array.fold_left max 0. choices
+  in
+  shopper 0. 0.
+  
+let best_value_unique articles max_w =
+  (* Store items that have already been chosen in the array [taken]. *)
+  (* Choose the item if you can and recursively search further. *)
+  let rec get_item taken acc_w acc_p i (_, p, w) =
+    if acc_w +. w > max_w || taken.(i) then
+      (* Item is not suitable, return what we got so far.*)
+      acc_p
+    else
+      (* Find best value after choosing the item, mark choice in [taken]. *)
+      let new_taken = Array.copy taken in
+      (new_taken.(i) <- true; shopper new_taken (acc_w +. w) (acc_p +. p))
+  (* Choose every item in the list and return the value of the best choice. *)  
+  and shopper taken w p =
+    let choices = Array.mapi (get_item taken w p) articles in
+    Array.fold_left max 0. choices
+  in
+  let taken = Array.map (fun _ -> false) articles in
+  shopper taken 0. 0.
+
 (*----------------------------------------------------------------------------*]
  Cena sprehoda po drevesu je vsota vrednosti v vseh obiskanih vozliščih.
  Poiščite vrednost najdražjega sprehoda od korena do listov drevesa.
@@ -181,13 +219,46 @@ let articles = [|
 - : int option = Some 21
 [*----------------------------------------------------------------------------*)
 
-type 'a tree
- = Empty
+(* 1. Establish bounds *)
+(* 2. Make memory *)
+(* 3. Calculate one value by using recursion with memory *)
+(* 4. Loop over all values in the correct order *)
+(* 5. Retrun result *)
+
+type 'a tree =
+ | Empty
  | Node of ('a tree) * 'a * ('a tree)
 
 let leaf x = Node (Empty, x, Empty)
 
 let test_tree = Node( Node(leaf 0, 2, leaf 13), 5, Node(leaf 9, 7, leaf 4))
+
+let rec max_path tree =
+  match tree with
+    | Empty -> None
+    | Node (Empty, x, Empty) -> Some x
+    | Node (lt, x, rt) -> 
+        match (max_path lt), (max_path rt) with
+        | None, Some y -> Some (x + y)
+        | Some y, None -> Some (y + x)
+        | Some y, Some z -> Some (x + max z y)
+        | None, None -> Some x
+
+(* Resitve: *)
+
+let max_pomozna a b =
+  match a, b with
+  | None, None -> failwith "Error"
+  | None, Some y -> y
+  | Some x, None -> x
+  | Some x, Some y -> max x y
+
+let rec max_path_resitve tree =
+  match tree with
+  | Empty -> None
+  | Node (Empty, x, Empty) -> Some x
+  | Node (lt, x, rt) -> Some (x + max_pomozna (max_path_resitve rt) (max_path_resitve lt) )
+
 
 (*----------------------------------------------------------------------------*]
  Cena sprehoda po drevesu je vsota vrednosti v vseh obiskanih vozliščih.
@@ -204,6 +275,39 @@ let test_tree = Node( Node(leaf 0, 2, leaf 13), 5, Node(leaf 9, 7, leaf 4))
 - : int list = [5; 7; 9]
 [*----------------------------------------------------------------------------*)
 
-type direcion 
-  = Left
-  | Right
+type direcion  = Left | Right
+
+let rec pot tree =
+  match tree with
+  | Empty -> []
+  | Node (Empty, x, Empty) -> []
+  | Node (lt, x, rt) -> 
+      match max_path_resitve lt, max_path_resitve rt with
+      | None, None -> []
+      | None, Some y -> Right :: (pot rt)
+      | Some y, None -> Left :: (pot lt)
+      | Some y, Some z -> if y > z then Left :: (pot lt) else Right :: (pot rt)
+
+let reverse sez =
+  let rec rev sez acc =
+    match sez with
+    | [] -> acc
+    | x :: xs -> rev xs (x :: acc)
+  in rev sez []
+
+let reconstruct tree pot =
+  reverse (
+    let rec reconstruct' t p acc =
+      match t with
+      | Empty -> acc
+      | Node (lt, x, rt) ->
+        match p with
+        | [] -> x :: acc
+        | Right :: xs -> reconstruct' rt xs (x :: acc)
+        | Left :: xs -> reconstruct' lt xs (x :: acc)
+    in
+    reconstruct' tree pot []
+  )
+
+
+

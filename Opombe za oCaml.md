@@ -11,6 +11,12 @@ S tremi ti namreč ne najde prave relativne poti do datotek.
 # C
 # Č
 # D
+    DINAMIČNO PROGRAMIRANJE
+        Koraki: 1. Establish bounds
+                2. Make memory
+                3. Calculate one value by using recursion with memory
+                4. Loop over all values in the correct order
+                5. Retrun result
 # E
 
 
@@ -70,7 +76,7 @@ S tremi ti namreč ne najde prave relativne poti do datotek.
 
     ZAMIKI:
         Če kdaj VS Code ne zamika lepo vrstic, klikni spodaj v opravilni vrstici desno Spaces oz. Tab size oz. kakroli se izpiše (odvisno od
-        tega, ali delam v oCamlu, Markdownu, ...). Za oCaml in Python si nastavim tab size na 4. Za oCaml sicer ni nujno, je pa lepo, Python
-        pa je zelo občutljiv na pravilne zamike.
+        tega, ali delam v oCamlu, Markdownu, ...). Za oCaml si nastavim tab size na 2, za Python na 4. Za oCaml sicer ni nujno, je pa lepo, 
+        Python pa je zelo občutljiv na pravilne zamike.
 
 # Ž

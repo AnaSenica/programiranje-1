@@ -31,29 +31,29 @@ def fib_cache(n):
 #                     /     \
 #                    3       4
 #                  /  \     /  \
-#                 2   1    3    2
+#                 2    1   3    2
 #                /\       /\    /\
-#               1  0     2  1  1 0
+#               1  0     2  1  1  0
+#                       /\ 
+#                      1  0
 #      
 # Definirajte rekurzivno memoizirano funkcijo fib brez uporabe dekoratorja.
 # Omejitev: Preseže največjo dovoljeno globino rekurzija za ~1000.
-spomin = {}
-def fib_memo_rec(n):
-    if n <= 1:
-        return 1
-    else:
-        if n - 1 in spomin.keys() and  n - 2 in spomin.keys():
-            rezultat = spomin[n-1] + spomin[n-2]
-            spomin[n] = rezultat
-            print(spomin)
-            return rezultat
+
+
+def fib_memo_rec2(n):
+    # Naredim ravno prav velik seznam, v katerega shranjujem vrednosti. Mora biti dolg vsaj 2??
+    seznam = [None for i in range(max(2, n+1))]
+    def pomozna(m):
+        if m <= 2:
+            return m
         else:
-            a = fib(n-1)
-            b = fib(n-2)
-            spomin[n-1] = a
-            spomin[n-2] = b
-            print(spomin)
-            return  a + b
+            if seznam[m] == None:
+                seznam[m] = pomozna(m-1) + pomozna(m-2)
+                return seznam[m]
+            else:
+                return seznam[m]
+    return pomozna(n)
 
 
 # Na katere podprobleme se direktno skicuje rekurzivna definicija fib?
@@ -62,9 +62,24 @@ def fib_memo_rec(n):
 # vrednosti od 1 proti n.)
 
 def fib_memo_iter(n):
-    pass
+    seznam = [None for i in range(max(2, n+1))]
+    for i in range(n+1):
+        if i <= 2:
+            seznam[i] = i
+        else:
+            seznam[i] = seznam[i-1] + seznam[i-2]
+    return seznam[n]
 
 # Izboljšajte prejšnjo različico tako, da hrani zgolj rezultate, ki jih v
 # nadaljevanju nujno potrebuje.
 def fib_iter(n):
-    pass
+    if n < 2:
+        return n
+    else:
+        x_2 = 0
+        x_1 = 1
+        for i in range(2,n+1):
+            x = x_1 + x_2
+            x_2 = x_1
+            x_1 = x
+        return x
