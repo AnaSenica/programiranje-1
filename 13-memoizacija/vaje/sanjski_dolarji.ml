@@ -1,8 +1,8 @@
 (* Vaja povečini povzeta iz zapiskov predavanj Jeffa Ericksona. *)
 
 (* V prejšnjem življenju ste delali kot blagajničar v pozabljeni antarktični
-   koliniji Nadira, kjer ste večino dneva porabili za vračanje drobiža kupcem.
-   Ker je papir redek na antarktiki so blagajničarji morali po zakonu vračati
+   koloniji Nadira, kjer ste večino dneva porabili za vračanje drobiža kupcem.
+   Ker je papir redek na Antarktiki, so blagajničarji morali po zakonu vračati
    najmanjše možno število bankovcev kot drobiž. Po zaslugi numerološke
    navdušenosti enega od ustanoviteljev Nadire je denar, imenovan sanjski
    dolarji, na voljo v naslednjih bankovcih: $1, $4, $7, $13, $28, $52, $91, $365.
