@@ -60,7 +60,7 @@ let rec vstavi n veriga =
 (* Profesorjeva rešitev: *)
 let rec vstavi' x = function
 	| Filter (f, ys, rest) when f x -> Filter (f, x::ys, rest)
-	| Filter (f, ys, rest) (* not f x*) -> Filter (f, ys, vstavi x rest)
+	| Filter (f, ys, rest) (* not f x*) -> Filter (f, ys, vstavi' x rest)
 	| Ostalo ys -> Ostalo (x::ys) 
 
 (*c*)
@@ -75,7 +75,10 @@ let rec poisci x veriga =
 let rec izprazni_filtre = function
 	| Filter (f, ys, rest) -> 
 			let (empty_rest, elements) = izprazni_filtre rest in
+				(* 'empty_rest' je veriga, ki jo dobimo, ko izpraznemo še rest.
+				   'elements' je seznam elementov, ki jih pri tem damo iz verige. *)
 			(Filter (f, [], empty_rest), ys @ elements)
+				(* Na koncu želimo le filter f, ki je prazen, prav tako pa je prazna nadaljnja veriga. *)
 	| Ostalo sez -> (Ostalo [], sez)
 
 
